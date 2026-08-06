@@ -113,3 +113,12 @@ resource "aws_s3_object" "error" {
 
   etag = filemd5("${path.module}/website/error.html")
 }
+
+resource "aws_s3_object" "menu" {
+  bucket       = aws_s3_bucket.website.id
+  key          = "/website/images/cafe/Late_Night.png"
+  source       = "${path.module}/website/images/cafe/Late_Night.png"
+  content_type = "image/png"
+
+  etag = filemd5("${path.module}/website/images/cafe/Late_Night.png")
+}
