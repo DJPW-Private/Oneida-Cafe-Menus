@@ -127,7 +127,7 @@ resource "aws_s3_object" "files" {
   for_each = fileset("${path.module}/website/images", "**")
 
   bucket = aws_s3_bucket.website.id
-  key    = each.value
+  key    = "images/${each.value}"
   source = "${path.module}/website/images/${each.value}"
   content_type = "image/png"
 
