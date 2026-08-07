@@ -96,39 +96,40 @@ resource "aws_s3_bucket_policy" "public_read" {
   ]
 }
 
-# resource "aws_s3_object" "index" {
-#   bucket       = aws_s3_bucket.website.id
-#   key          = "index.html"
-#   source       = "${path.module}/website/index.html"
-#   content_type = "text/html"
+resource "aws_s3_object" "index" {
+  bucket       = aws_s3_bucket.website.id
+  key          = "index.html"
+  source       = "${path.module}/website/index.html"
+  content_type = "text/html"
 
-#   etag = filemd5("${path.module}/website/index.html")
-# }
+  etag = filemd5("${path.module}/website/index.html")
+}
 
-# resource "aws_s3_object" "error" {
-#   bucket       = aws_s3_bucket.website.id
-#   key          = "error.html"
-#   source       = "${path.module}/website/error.html"
-#   content_type = "text/html"
+resource "aws_s3_object" "error" {
+  bucket       = aws_s3_bucket.website.id
+  key          = "error.html"
+  source       = "${path.module}/website/error.html"
+  content_type = "text/html"
 
-#   etag = filemd5("${path.module}/website/error.html")
-# }
+  etag = filemd5("${path.module}/website/error.html")
+}
 
-# resource "aws_s3_object" "menu" {
-#   bucket       = aws_s3_bucket.website.id
-#   key          = "/website/images/cafe/Menu-x3.png"
-#   source       = "${path.module}/website/images/cafe/Menu-x3.png"
-#   content_type = "image/png"
+resource "aws_s3_object" "4x2_display" {
+  bucket       = aws_s3_bucket.website.id
+  key          = "4x2_display.html"
+  source       = "${path.module}/website/4x2_display.html"
+  content_type = "text/html"
 
-#   etag = filemd5("${path.module}/website/images/cafe/Menu-x3.png")
-# }
+  etag = filemd5("${path.module}/website/4x2_display.html")
+}
 
 resource "aws_s3_object" "files" {
-  for_each = fileset("${path.module}/website", "**")
+  for_each = fileset("${path.module}/website/images", "**")
 
   bucket = aws_s3_bucket.website.id
   key    = each.value
-  source = "${path.module}/website/${each.value}"
+  source = "${path.module}/website/images/${each.value}"
+  content_type = "image/png"
 
-  etag = filemd5("${path.module}/website/${each.value}")
+  etag = filemd5("${path.module}/website/images/${each.value}")
 }
