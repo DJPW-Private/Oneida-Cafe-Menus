@@ -123,17 +123,12 @@ resource "aws_s3_bucket_policy" "public_read" {
 #   etag = filemd5("${path.module}/website/images/cafe/Menu-x3.png")
 # }
 
-variable "source_folder" {
-  type    = string
-  default = "${path.module}/website"
-}
-
 resource "aws_s3_object" "files" {
-  for_each = fileset(var.source_folder, "**")
+  for_each = fileset("${path.module}/website", "**")
 
   bucket = aws_s3_bucket.site.id
   key    = each.value
-  source = "${var.source_folder}/${each.value}"
+  source = "${path.module}/website/${each.value}"
 
-  etag = filemd5("${var.source_folder}/${each.value}")
+  etag = filemd5("${path.module}/website/${each.value}")
 }
