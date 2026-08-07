@@ -114,7 +114,7 @@ resource "aws_s3_object" "error" {
   etag = filemd5("${path.module}/website/error.html")
 }
 
-resource "aws_s3_object" "4x2_display" {
+resource "aws_s3_object" "display_4x2" {
   bucket       = aws_s3_bucket.website.id
   key          = "4x2_display.html"
   source       = "${path.module}/website/4x2_display.html"
