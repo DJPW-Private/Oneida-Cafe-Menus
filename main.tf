@@ -126,7 +126,7 @@ resource "aws_s3_bucket_policy" "public_read" {
 resource "aws_s3_object" "files" {
   for_each = fileset("${path.module}/website", "**")
 
-  bucket = aws_s3_bucket.site.id
+  bucket = aws_s3_bucket.website.id
   key    = each.value
   source = "${path.module}/website/${each.value}"
 
