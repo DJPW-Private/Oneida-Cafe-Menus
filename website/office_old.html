@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oneida</title>
+
+<style>
+    html, body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    img {
+        max-width: 100vw;
+        max-height: 100vh;
+        object-fit: contain;
+    }
+</style>
+</head>
+<body>
+
+<img id="viewer" alt="Image">
+
+<script>
+const folder = "images/office/";
+const extension = ".png";
+const interval = 15000; // milliseconds
+
+let currentImage = 1;
+const viewer = document.getElementById("viewer");
+
+function loadNextImage() {
+    const filename = `${folder}image${currentImage}${extension}`;
+
+    const test = new Image();
+
+    test.onload = () => {
+        viewer.src = filename;
+        currentImage++;
+    };
+
+    test.onerror = () => {
+        // Hit a 404, start over.
+        currentImage = 1;
+        viewer.src = `${folder}image1${extension}`;
+        currentImage++;
+    };
+
+    test.src = filename;
+}
+
+// Load immediately
+loadNextImage();
+
+// Continue cycling
+setInterval(loadNextImage, interval);
+</script>
+
+</body>
+</html>
