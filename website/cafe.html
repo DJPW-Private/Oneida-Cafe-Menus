@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Café Display</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    width: 100vw;
+    height: 100vh;
+
+    gap: 10px;
+    padding: 10px;
+
+    box-sizing: border-box;
+}
+
+.cell {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+}
+
+.cell img {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.cell img.visible {
+    opacity: 1;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="grid">
+
+    <div class="cell">
+        <img id="img0">
+    </div>
+
+    <div class="cell">
+        <img id="img1">
+    </div>
+
+    <div class="cell">
+        <img id="img2">
+    </div>
+
+</div>
+
+
+<script>
+
+const folder = "images/cafe/";
+const extension = ".jpg";
+
+const displayDelay = 15000;       // 15 seconds
+const newImageCheckDelay = 30000; // 30 seconds
+const fadeTime = 1500;            // 1.5 second fade
+
+let images = [];
+let startIndex = 0;
+
+
+/*
+ * Check whether an image exists.
+ */
+function imageExists(filename) {
+
+    return new Promise(resolve => {
+
+        const img = new Image();
+
+        img.onload = () => resolve(true);
+
+        img.onerror = () => resolve(false);
+
+        /*
+         * Prevent browser/server caching from
+         * hiding newly added files.
+         */
+        img.src =
+            filename +
+            "?check=" +
+            Date.now();
+    });
+}
+
+
+/*
+ * Discover all sequentially numbered images.
+ *
+ * image1.jpg
+ * image2.jpg
+ * image3.jpg
+ * ...
+ *
+ * Stops at the first 404.
+ */
+async function discoverImages() {
+
+    const discovered = [];
+
+    let number = 1;
+
+    while (true) {
+
+        const filename =
+            `${folder}image${number}${extension}`;
+
+        if (await imageExists(filename)) {
+
+            discovered.push(filename);
+
+            number++;
+
+        } else {
+
+            break;
+        }
+    }
+
+    return discovered;
+}
+
+
+/*
+ * Display three consecutive images.
+ */
+function showImages() {
+
+    if (images.length === 0)
+        return;
+
+
+    for (let i = 0; i < 3; i++) {
+
+        const imageElement =
+            document.getElementById("img" + i);
+
+        const index =
+            (startIndex + i) % images.length;
+
+        const filename =
+            images[index];
+
+
+        /*
+         * Load the image into a temporary Image first.
+         * This prevents a partially loaded image from
+         * appearing on the display.
+         */
+        const preload = new Image();
+
+        preload.onload = function() {
+
+            imageElement.src = filename;
+
+            /*
+             * Allow the browser to register the new
+             * image before starting the fade.
+             */
+            requestAnimationFrame(() => {
+
+                imageElement.classList.add("visible");
+
+            });
+        };
+
+        preload.src = filename;
+    }
+
+
+    /*
+     * Move the three-image window forward one image.
+     */
+    startIndex =
+        (startIndex + 1) % images.length;
+}
+
+
+/*
+ * Look for newly added images.
+ */
+async function checkForNewImages() {
+
+    const discovered =
+        await discoverImages();
+
+
+    /*
+     * Only update the list if something changed.
+     */
+    if (discovered.length !== images.length) {
+
+        console.log(
+            "Image count changed:",
+            images.length,
+            "→",
+            discovered.length
+        );
+
+
+        images = discovered;
+
+
+        /*
+         * Make sure our position is still valid.
+         */
+        if (startIndex >= images.length) {
+
+            startIndex = 0;
+        }
+    }
+}
+
+
+/*
+ * Start the display.
+ */
+async function start() {
+
+    images =
+        await discoverImages();
+
+
+    if (images.length === 0) {
+
+        console.log("No images found.");
+
+        return;
+    }
+
+
+    /*
+     * Show the initial three images.
+     */
+    showImages();
+
+
+    /*
+     * Rotate every 15 seconds.
+     */
+    setInterval(
+        showImages,
+        displayDelay
+    );
+
+
+    /*
+     * Check for newly added images every 30 seconds.
+     */
+    setInterval(
+        checkForNewImages,
+        newImageCheckDelay
+    );
+}
+
+
+start();
+
+</script>
+
+</body>
+</html>
