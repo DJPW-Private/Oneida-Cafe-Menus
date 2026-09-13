@@ -131,6 +131,14 @@ resource "aws_s3_object" "office" {
 
   etag = filemd5("${path.module}/website/office.html")
 }
+resource "aws_s3_object" "cafe" {
+  bucket       = aws_s3_bucket.website.id
+  key          = "cafe.html"
+  source       = "${path.module}/website/cafe.html"
+  content_type = "text/html"
+
+  etag = filemd5("${path.module}/website/cafe.html")
+}
 resource "aws_s3_object" "files" {
   for_each = fileset("${path.module}/website/images", "**")
 
