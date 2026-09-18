@@ -149,6 +149,7 @@ resource "aws_s3_object" "office" {
 
   etag = filemd5("${path.module}/website/office.html")
 }
+
 resource "aws_s3_object" "cafe" {
   bucket       = aws_s3_bucket.website.id
   key          = "cafe.html"
@@ -157,6 +158,7 @@ resource "aws_s3_object" "cafe" {
 
   etag = filemd5("${path.module}/website/cafe.html")
 }
+
 resource "aws_s3_object" "files" {
   for_each = fileset("${path.module}/website/images", "**")
 
@@ -166,4 +168,15 @@ resource "aws_s3_object" "files" {
   content_type = "image/png"
 
   etag = filemd5("${path.module}/website/images/${each.value}")
+}
+
+resource "aws_s3_object" "videos" {
+  for_each = fileset("${path.module}/website/videos", "**")
+
+  bucket = aws_s3_bucket.website.id
+  key    = "videos/${each.value}"
+  source = "${path.module}/website/videos/${each.value}"
+  content_type = "video/mp4"
+
+  etag = filemd5("${path.module}/website/videos/${each.value}")
 }
