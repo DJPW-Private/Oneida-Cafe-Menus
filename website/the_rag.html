@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+    <title>Oneida Rag</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #e5e5e5;
+        }
+
+        main {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        a {
+            display: block;
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #ffffff;
+        }
+
+        a + a {
+            margin-top: 12px;
+        }
+
+        @media (max-width: 600px) {
+            a + a {
+                margin-top: 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <a href="images/rag/image1.jpg" target="_blank" aria-label="Open the first page full size">
+            <img src="images/rag/image1.jpg" alt="Oneida Rag page 1">
+        </a>
+
+        <a href="images/rag/image2.jpg" target="_blank" aria-label="Open the second page full size">
+            <img src="images/rag/image2.jpg" alt="Oneida Rag page 2" loading="lazy">
+        </a>
+    </main>
+</body>
+</html>
