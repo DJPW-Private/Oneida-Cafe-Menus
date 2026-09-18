@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Display</title>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+        }
+
+        .image-grid {
+            width: 100vw;
+            height: 100vh;
+
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+
+            gap: 0;
+        }
+
+        .image-grid > img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+
+            display: block;
+        }
+
+
+        /* =========================================
+           WEATHER PANEL
+           ========================================= */
+
+        .weather-panel {
+            width: 100%;
+            height: 100%;
+
+            box-sizing: border-box;
+
+            background: linear-gradient(
+                180deg,
+                #1261a0 0%,
+                #3b8dcc 50%,
+                #75b9e6 100%
+            );
+
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+
+            overflow: hidden;
+
+            padding: 25px 30px;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        .weather-title {
+            font-size: clamp(28px, 2.1vw, 52px);
+            font-weight: bold;
+            text-align: center;
+
+            margin-bottom: 15px;
+
+            flex-shrink: 0;
+        }
+
+        .weather-view {
+            flex: 1;
+            min-height: 0;
+        }
+
+
+        /* =========================================
+           DAILY / MULTI-PERIOD FORECAST
+           ========================================= */
+
+        .weather-day {
+            display: flex;
+            align-items: center;
+
+            height: 19%;
+
+            box-sizing: border-box;
+
+            border-bottom: 2px solid rgba(255,255,255,.25);
+        }
+
+        .weather-day:last-child {
+            border-bottom: none;
+        }
+
+        .weather-day img {
+            width: 80px;
+            height: 80px;
+
+            object-fit: contain;
+
+            margin-right: 20px;
+
+            flex-shrink: 0;
+        }
+
+        .weather-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .weather-name {
+            font-size: clamp(20px, 1.25vw, 32px);
+            font-weight: bold;
+        }
+
+        .weather-temp {
+            font-size: clamp(28px, 1.8vw, 44px);
+            font-weight: bold;
+        }
+
+        .weather-desc {
+            font-size: clamp(16px, .95vw, 24px);
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /* =========================================
+           HOURLY FORECAST
+           ========================================= */
+
+        .hour-row {
+            display: flex;
+            align-items: center;
+
+            height: 12.25%;
+
+            box-sizing: border-box;
+
+            border-bottom: 2px solid rgba(255,255,255,.20);
+        }
+
+        .hour-row:last-child {
+            border-bottom: none;
+        }
+
+        .hour-time {
+            width: 115px;
+
+            font-size: clamp(18px, 1.15vw, 30px);
+            font-weight: bold;
+
+            flex-shrink: 0;
+        }
+
+        .hour-row img {
+            width: 60px;
+            height: 60px;
+
+            object-fit: contain;
+
+            margin-right: 15px;
+
+            flex-shrink: 0;
+        }
+
+        .hour-temp {
+            width: 100px;
+
+            font-size: clamp(24px, 1.5vw, 38px);
+            font-weight: bold;
+
+            flex-shrink: 0;
+        }
+
+        .hour-desc {
+            flex: 1;
+
+            font-size: clamp(15px, .9vw, 23px);
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /* =========================================
+           STATUS / ERROR MESSAGE
+           ========================================= */
+
+        .weather-status {
+            height: 100%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            font-size: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="image-grid">
+
+        <img src="images/Display-4x2/image_1-1.png" alt="">
+
+        <img src="images/Display-4x2/image_1-2.png" alt="">
+
+
+        <!-- =======================================
+             WEATHER REPLACES image_1-3.png
+             ======================================= -->
+
+        <div class="weather-panel">
+
+            <div
+                id="weather-title"
+                class="weather-title">
+                Local Weather
+            </div>
+
+            <div
+                id="weather-daily"
+                class="weather-view">
+
+                <div class="weather-status">
+                    Loading weather...
+                </div>
+
+            </div>
+
+            <div
+                id="weather-hourly"
+                class="weather-view"
+                style="display:none;">
+            </div>
+
+        </div>
+
+
+        <img src="images/Display-4x2/image_1-4.png" alt="">
+
+        <img src="images/Display-4x2/image_2-1.png" alt="">
+        <img src="images/Display-4x2/image_2-2.png" alt="">
+        <img src="images/Display-4x2/image_2-3.png" alt="">
+        <img src="images/Display-4x2/image_2-4.png" alt="">
+
+    </div>
+
+
+    <script>
+
+        /*
+         * Camp Oneida weather location.
+         *
+         * Change these if necessary to the exact
+         * latitude / longitude you want displayed.
+         */
+
+        const LAT = 41.88686;
+        const LON = -75.66602;
+
+
+        /*
+         * Alternate daily/hourly every 15 seconds.
+         */
+
+        const ROTATE_TIME = 15000;
+
+
+        /*
+         * Refresh NWS data every 15 minutes.
+         */
+
+        const WEATHER_REFRESH =
+            15 * 60 * 1000;
+
+
+        let showingHourly = false;
+
+
+        /*
+         * Convert NWS ISO timestamp into
+         * a simple hour such as "8 PM".
+         */
+
+        function formatHour(dateString) {
+
+            const date =
+                new Date(dateString);
+
+            return date.toLocaleTimeString(
+                [],
+                {
+                    hour: "numeric"
+                }
+            );
+        }
+
+
+        /*
+         * Load weather from the
+         * National Weather Service.
+         */
+
+        async function loadWeather() {
+
+            try {
+
+                /*
+                 * First ask NWS which forecast grid
+                 * handles our latitude/longitude.
+                 */
+
+                const pointResponse =
+                    await fetch(
+                        `https://api.weather.gov/points/${LAT},${LON}`
+                    );
+
+
+                if (!pointResponse.ok) {
+                    throw new Error(
+                        "Unable to retrieve NWS location."
+                    );
+                }
+
+
+                const pointData =
+                    await pointResponse.json();
+
+
+                const dailyURL =
+                    pointData.properties.forecast;
+
+                const hourlyURL =
+                    pointData.properties.forecastHourly;
+
+
+                /*
+                 * Get daily and hourly forecasts
+                 * simultaneously.
+                 */
+
+                const [
+                    dailyResponse,
+                    hourlyResponse
+                ] = await Promise.all([
+
+                    fetch(dailyURL),
+
+                    fetch(hourlyURL)
+
+                ]);
+
+
+                if (
+                    !dailyResponse.ok ||
+                    !hourlyResponse.ok
+                ) {
+
+                    throw new Error(
+                        "Unable to retrieve NWS forecast."
+                    );
+
+                }
+
+
+                const dailyData =
+                    await dailyResponse.json();
+
+                const hourlyData =
+                    await hourlyResponse.json();
+
+
+                /*
+                 * =================================
+                 * DAILY FORECAST
+                 * =================================
+                 */
+
+                const periods =
+                    dailyData.properties.periods.slice(0, 5);
+
+
+                let dailyHTML = "";
+
+
+                periods.forEach(period => {
+
+                    dailyHTML += `
+
+                        <div class="weather-day">
+
+                            <img
+                                src="${period.icon}"
+                                alt="${period.shortForecast}"
+                            >
+
+                            <div class="weather-info">
+
+                                <div class="weather-name">
+                                    ${period.name}
+                                </div>
+
+                                <div class="weather-temp">
+                                    ${period.temperature}°${period.temperatureUnit}
+                                </div>
+
+                                <div class="weather-desc">
+                                    ${period.shortForecast}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                });
+
+
+                document
+                    .getElementById("weather-daily")
+                    .innerHTML = dailyHTML;
+
+
+
+                /*
+                 * =================================
+                 * HOURLY FORECAST
+                 * =================================
+                 */
+
+                const hours =
+                    hourlyData.properties.periods.slice(0, 8);
+
+
+                let hourlyHTML = "";
+
+
+                hours.forEach(period => {
+
+                    hourlyHTML += `
+
+                        <div class="hour-row">
+
+                            <div class="hour-time">
+                                ${formatHour(period.startTime)}
+                            </div>
+
+                            <img
+                                src="${period.icon}"
+                                alt="${period.shortForecast}"
+                            >
+
+                            <div class="hour-temp">
+                                ${period.temperature}°
+                            </div>
+
+                            <div class="hour-desc">
+                                ${period.shortForecast}
+                            </div>
+
+                        </div>
+
+                    `;
+
+                });
+
+
+                document
+                    .getElementById("weather-hourly")
+                    .innerHTML = hourlyHTML;
+
+
+            }
+            catch(error) {
+
+                console.error(
+                    "Weather error:",
+                    error
+                );
+
+
+                document
+                    .getElementById("weather-daily")
+                    .innerHTML = `
+
+                        <div class="weather-status">
+                            Weather temporarily unavailable
+                        </div>
+
+                    `;
+
+            }
+
+        }
+
+
+        /*
+         * Alternate between forecast views.
+         */
+
+        function rotateWeather() {
+
+            const daily =
+                document.getElementById(
+                    "weather-daily"
+                );
+
+            const hourly =
+                document.getElementById(
+                    "weather-hourly"
+                );
+
+            const title =
+                document.getElementById(
+                    "weather-title"
+                );
+
+
+            showingHourly =
+                !showingHourly;
+
+
+            if (showingHourly) {
+
+                daily.style.display =
+                    "none";
+
+                hourly.style.display =
+                    "block";
+
+                title.textContent =
+                    "Hourly Forecast";
+
+            }
+            else {
+
+                daily.style.display =
+                    "block";
+
+                hourly.style.display =
+                    "none";
+
+                title.textContent =
+                    "Local Weather";
+
+            }
+
+        }
+
+
+        /*
+         * Initial weather load.
+         */
+
+        loadWeather();
+
+
+        /*
+         * Refresh forecast every 15 minutes.
+         */
+
+        setInterval(
+            loadWeather,
+            WEATHER_REFRESH
+        );
+
+
+        /*
+         * Change display every 15 seconds.
+         */
+
+        setInterval(
+            rotateWeather,
+            ROTATE_TIME
+        );
+
+    </script>
+
+</body>
+</html>
