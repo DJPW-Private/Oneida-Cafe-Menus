@@ -167,6 +167,16 @@ resource "aws_s3_object" "rag" {
 
   etag = filemd5("${path.module}/website/the_rag.html")
 }
+
+resource "aws_s3_object" "schedule" {
+  bucket       = aws_s3_bucket.website.id
+  key          = "schedule.html"
+  source       = "${path.module}/website/schedule.html"
+  content_type = "text/html"
+
+  etag = filemd5("${path.module}/website/schedule.html")
+}
+
 resource "aws_s3_object" "files" {
   for_each = fileset("${path.module}/website/images", "**")
 
