@@ -168,13 +168,13 @@ resource "aws_s3_object" "rag" {
   etag = filemd5("${path.module}/website/the_rag.html")
 }
 
-resource "aws_s3_object" "schedule" {
+resource "aws_s3_object" "the_schedule.html" {
   bucket       = aws_s3_bucket.website.id
-  key          = "schedule.html"
-  source       = "${path.module}/website/schedule.html"
+  key          = "the_schedule.html"
+  source       = "${path.module}/website/the_schedule.html"
   content_type = "text/html"
 
-  etag = filemd5("${path.module}/website/schedule.html")
+  etag = filemd5("${path.module}/website/the_schedule.html")
 }
 
 resource "aws_s3_object" "files" {
