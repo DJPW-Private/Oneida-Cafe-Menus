@@ -100,7 +100,23 @@
 
         start();
     </script>
+    
+    <script>
+        // Double-click anywhere to return to the menu
+        document.addEventListener("dblclick", function () {
+            window.location.href = "index.html";
+        });
 
+        // Press ESC or M to return to the menu
+        document.addEventListener("keydown", function (event) {
+            if (
+                event.key === "Escape" ||
+                event.key.toLowerCase() === "m"
+            ) {
+                window.location.href = "index.html";
+            }
+        });
+    </script>
 </body>
 
 </html>
