@@ -1,103 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rotating 3-Image Viewer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating 3-Image Viewer</title>
 
-<style>
-body {
-    margin: 0;
-    background: #111;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-}
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+        }
 
-.grid img {
-    height: 100%;
-    width: 100%;
+        .grid img {
+            height: 100%;
+            width: 100%;
 
-    object-fit: contain;
-    background: black;
-}
-</style>
+            object-fit: contain;
+            background: black;
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="grid">
-    <img id="img0">
-    <img id="img1">
-    <img id="img2">
-</div>
+    <div class="grid">
+        <img id="img0">
+        <img id="img1">
+        <img id="img2">
+    </div>
 
-<script>
-const folder = "images/office/";
-const extension = ".png";
-const delay = 15000;
+    <script>
+        const folder = "images/office/";
+        const extension = ".png";
+        const delay = 15000;
 
-// Cached list of images we've discovered.
-let images = [];
-let startIndex = 0;
+        // Cached list of images we've discovered.
+        let images = [];
+        let startIndex = 0;
 
-function imageExists(filename) {
-    return new Promise(resolve => {
-        const img = new Image();
+        function imageExists(filename) {
+            return new Promise(resolve => {
+                const img = new Image();
 
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
 
-        img.src = filename + "?t=" + Date.now(); // prevent caching
-    });
-}
-
-async function discoverImages() {
-    images = [];
-    let n = 1;
-
-    while (true) {
-        const filename = `${folder}image${n}${extension}`;
-
-        if (await imageExists(filename)) {
-            images.push(filename);
-            n++;
-        } else {
-            break;
+                img.src = filename + "?t=" + Date.now(); // prevent caching
+            });
         }
-    }
 
-    if (images.length === 0) {
-        alert("No images found.");
-    }
-}
+        async function discoverImages() {
+            images = [];
+            let n = 1;
 
-function showImages() {
-    for (let i = 0; i < 3; i++) {
-        const index = (startIndex + i) % images.length;
-        document.getElementById("img" + i).src = images[index];
-    }
+            while (true) {
+                const filename = `${folder}image${n}${extension}`;
 
-    startIndex = (startIndex + 1) % images.length;
-}
+                if (await imageExists(filename)) {
+                    images.push(filename);
+                    n++;
+                } else {
+                    break;
+                }
+            }
 
-async function start() {
-    await discoverImages();
+            if (images.length === 0) {
+                alert("No images found.");
+            }
+        }
 
-    if (images.length === 0)
-        return;
+        function showImages() {
+            for (let i = 0; i < 3; i++) {
+                const index = (startIndex + i) % images.length;
+                document.getElementById("img" + i).src = images[index];
+            }
 
-    showImages();
-    setInterval(showImages, delay);
-}
+            startIndex = (startIndex + 1) % images.length;
+        }
 
-start();
-</script>
+        async function start() {
+            await discoverImages();
+
+            if (images.length === 0)
+                return;
+
+            showImages();
+            setInterval(showImages, delay);
+        }
+
+        start();
+    </script>
 
 </body>
+
 </html>
